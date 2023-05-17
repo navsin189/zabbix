@@ -123,3 +123,24 @@ print(detail)
 ```
 [{'hostid': '10568', 'proxy_hostid': '0', 'host': 'localhost.localdomain', 'status': '0', 'ipmi_authtype': '-1', 'ipmi_privilege': '2', 'ipmi_username': '', 'ipmi_password': '', 'maintenanceid': '0', 'maintenance_status': '0', 'maintenance_type': '0', 'maintenance_from': '0', 'name': 'localhost.localdomain', 'flags': '0', 'templateid': '0', 'description': '', 'tls_connect': '1', 'tls_accept': '1', 'tls_issuer': '', 'tls_subject': '', 'proxy_address': '', 'auto_compress': '1', 'custom_interfaces': '0', 'uuid': '', 'vendor_name': '', 'vendor_version': '', 'inventory_mode': '1', 'active_available': '1'}]
 ```
+
+- Methods
+
+```
+Python 3.9.10 (main, Feb  9 2022, 00:00:00)
+[GCC 11.2.1 20220127 (Red Hat 11.2.1-9)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+
+>>> from zabbix_api import ZabbixAPI, ZabbixAPIException
+>>> zapi = ZabbixAPI(server="http://localhost/")
+>>> dir(zapi)
+['__checkauth__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattr__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__password__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__tokenauth__', '__username__', '__weakref__', '_setuplogging', 'api_version', 'auth', 'debug', 'do_request', 'httppasswd', 'httpuser', 'id', 'json_obj', 'kwargs', 'logged_in', 'logger', 'login', 'logout', 'method', 'params', 'proto', 'r_query', 'recent_query', 'server', 'set_log_level', 'test_login', 'timeout', 'url', 'validate_certs']
+```
+
+### How Zabbix API call works?
+
+```
+zapi.login(username, password) --> json_obj('user.login', params={'username': user, 'password': password}, auth=False) --> zapi.do_request --> fulfill requests.
+```
+
+- Every call gets converted in json object and then passed as argument to do_request.
