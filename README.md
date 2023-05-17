@@ -17,6 +17,7 @@ For more information and related downloads for Zabbix components, please visit h
 
 ### SETUP
 
+- ![Zabbix Architecture](https://static.packt-cdn.com/products/9781785289262/graphics/4239_01_02.jpg)
 - Initially I'm going to setup docker containers to have less load and better understanding.
 - Zabbix-6.4.2 requires MySQL >= 8 as database. Other RDMS can be used in place of MySQL.
 
