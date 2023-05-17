@@ -82,14 +82,19 @@ Include=/etc/zabbix/zabbix_agentd.d/*.conf
 4086:20230517:073337.130 failed to accept an incoming connection: connection from "172.19.0.3" rejected, allowed hosts: "192.168.1.6"
 ```
 
-### API(Haven't implemented)
-
-- [QuickStart](https://www.zabbix.com/documentation/current/en/manual/api)
-- curl --request POST \
-   --url 'http://localhost/api_jsonrpc.php' \
-   --header 'Authorization: Bearer 26e578c6352db346a493721f3e2629c0fbb4311d34d5b6d2680ccee1fc463d8b'
-
-- curl --request POST \
- --url 'https://localhost/api_jsonrpc.php' \
- --header 'Content-Type: application/json-rpc' \
- --data '{"jsonrpc":"2.0","method":"host.get","params":{"output":["hostid"]},"auth":"26e578c6352db346a493721f3e2629c0fbb4311d34d5b6d2680ccee1fc463d8b","id":1}'
+### API
+- Using Python script to call Zabbix API
+```
+pip install zabbix-api
+```
+- A demo
+```
+zapi = ZabbixAPI(server="http://localhost/")
+zapi.login("Admin", "zabbix")
+detail = zapi.host.get({'filter': {'host': 'localhost.localdomain'}})
+print(detail)
+```
+- output
+```
+[{'hostid': '10568', 'proxy_hostid': '0', 'host': 'localhost.localdomain', 'status': '0', 'ipmi_authtype': '-1', 'ipmi_privilege': '2', 'ipmi_username': '', 'ipmi_password': '', 'maintenanceid': '0', 'maintenance_status': '0', 'maintenance_type': '0', 'maintenance_from': '0', 'name': 'localhost.localdomain', 'flags': '0', 'templateid': '0', 'description': '', 'tls_connect': '1', 'tls_accept': '1', 'tls_issuer': '', 'tls_subject': '', 'proxy_address': '', 'auto_compress': '1', 'custom_interfaces': '0', 'uuid': '', 'vendor_name': '', 'vendor_version': '', 'inventory_mode': '1', 'active_available': '1'}]
+```
