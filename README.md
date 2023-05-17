@@ -83,18 +83,43 @@ Include=/etc/zabbix/zabbix_agentd.d/*.conf
 ```
 
 ### API
-- Using Python script to call Zabbix API
+
+- [QuickStart](https://www.zabbix.com/documentation/current/en/manual/api)
+- Let's convert this curl call into python script.
+- **Note -** I'm using password not token.
+
 ```
+curl --request POST \
+         --url 'http://localhost/api_jsonrpc.php' \
+         --header 'Content-Type: application/json-rpc' \
+         --data '{"jsonrpc":"2.0","method":"user.login","params":{"username":"Admin","password":"zabbix"},"id":1}'
+
+curl --request POST \
+         --url 'http://localhost/api_jsonrpc.php' \
+         --header 'Content-Type: application/json-rpc' \
+         --data '{"jsonrpc":"2.0","method":"host.get","params":{"output":["hostid"]},"auth":"0424bd59b807674191e7d77572075f33","id":1}'
+```
+
+- Using Python script to call Zabbix API
+
+```
+# https://github.com/erigones/zabbix-api/blob/master/zabbix_api.py
+# check line 193 and 259
+
 pip install zabbix-api
 ```
-- A demo
+
+- zabbix.py (Demo)
+
 ```
 zapi = ZabbixAPI(server="http://localhost/")
 zapi.login("Admin", "zabbix")
 detail = zapi.host.get({'filter': {'host': 'localhost.localdomain'}})
 print(detail)
 ```
+
 - output
+
 ```
 [{'hostid': '10568', 'proxy_hostid': '0', 'host': 'localhost.localdomain', 'status': '0', 'ipmi_authtype': '-1', 'ipmi_privilege': '2', 'ipmi_username': '', 'ipmi_password': '', 'maintenanceid': '0', 'maintenance_status': '0', 'maintenance_type': '0', 'maintenance_from': '0', 'name': 'localhost.localdomain', 'flags': '0', 'templateid': '0', 'description': '', 'tls_connect': '1', 'tls_accept': '1', 'tls_issuer': '', 'tls_subject': '', 'proxy_address': '', 'auto_compress': '1', 'custom_interfaces': '0', 'uuid': '', 'vendor_name': '', 'vendor_version': '', 'inventory_mode': '1', 'active_available': '1'}]
 ```
