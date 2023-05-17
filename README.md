@@ -1,2 +1,95 @@
-# zabbix
-Introduction to Zabbix - An open source monitoring tool
+# ZABBIX
+
+Zabbix is an enterprise-class open source distributed monitoring solution.
+
+Zabbix is software that monitors numerous parameters of a network and the health and integrity of servers. Zabbix uses a flexible notification mechanism that allows users to configure e-mail based alerts for virtually any event. This allows a fast reaction to server problems. Zabbix offers excellent reporting and data visualisation features based on the stored data. This makes Zabbix ideal for capacity planning.
+
+For more information and related downloads for Zabbix components, please visit https://hub.docker.com/u/zabbix/ and https://zabbix.com
+
+- It is an open source tool.
+- [Zabbix Architecture](https://www.zabbix.com/documentation/current/en/manual/introduction/overview)
+- Zabbix by default uses a "pull" model when a server connects to agents on each monitoring machine, and agents periodically gather the information and send it to a server. The alternative is "active checks" mode when agents establish a connection with a server and send data to it when it need.
+- **Passive and active checks**
+
+  - Zabbix agents can perform passive and active checks.
+  - In a passive check the agent responds to a data request. Zabbix server (or proxy) asks for data, for example, CPU load, and Zabbix agent sends back the result.
+  - Active checks require more complex processing. The agent must first retrieve a list of items from Zabbix server for independent processing. Then it will periodically send new values to the server.
+
+### SETUP
+
+- Initially I'm going to setup docker containers to have less load and better understanding.
+- Zabbix-6.4.2 requires MySQL >= 8 as database. Other RDMS can be used in place of MySQL.
+
+```
+sudo docker run --network zabbix --name zabbix_mysql -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=naveen -e MYSQL_USER=zabbix_admin -e MYSQL_PASSWORD=password -d mysql:8.0
+
+# After the server launched wait for some minutes as the Zabbix database Schema is getting created.
+sudo docker run --network zabbix --name zabbix_server_mysql -p 10051:10051 -e DB_SERVER_HOST=zabbix_mysql -e MYSQL_USER=root -e MYSQL_PASSWORD=admin -d zabbix/zabbix-server-mysql:alpine-trunk
+
+sudo docker logs -f zabbix_server_mysql
+
+sudo docker run --network zabbix --name zabbix_web_apache_mysql -p 80:8080 -e DB_SERVER_HOST=zabbix_mysql -e MYSQL_USER=root -e MYSQL_PASSWORD=admin -e ZBX_SERVER_HOST=zabbix_server_mysql -e PHP_TZ="Asia/Kolkata" -d zabbix/zabbix-web-apache-mysql:ubuntu-latest
+```
+
+### Zabbix UI
+
+- [QuickStart](https://www.zabbix.com/documentation/current/en/manual/quickstart/login)
+- access the UI on port 80
+- Enter **Admin** as username and **zabbix** as password.
+- The Dashboard will appear after successful login.
+- From left panel go to
+
+  - Data Collection then
+    - [Hosts](https://www.zabbix.com/documentation/current/en/manual/quickstart/host)
+      - Add new host. Remember Hostname should be unique.
+      - Add [templates](https://www.zabbix.com/documentation/current/en/manual/quickstart/template) named(as a starter)
+        - Linux by Zabbix agent
+        - Zabbix server health
+      - Add interface and update the IP or DNS of the target machine.
+      - other than this go with by default config.
+
+### Zabbix Agent
+
+- [QuickStart](https://www.zabbix.com/documentation/current/en/manual/concepts/agent)
+- Download [zabbix agent](https://repo.zabbix.com/zabbix/6.4/) for your OS.
+- I install zabbix-agent on my Rocky 9 machine
+
+```
+sudo dnf install https://repo.zabbix.com/zabbix/6.4/rhel/9/x86_64/zabbix-agent-6.4.0-release1.el9.x86_64.rpm
+```
+
+- Updated `/etc/zabbix/zabbix_agentd.conf`
+
+```
+EnableRemoteCommands=1
+PidFile=/run/zabbix/zabbix_agentd.pid
+LogFile=/var/log/zabbix/zabbix_agentd.log
+LogFileSize=0
+# this is my zabbix_server_mysql container IP
+Server=172.19.0.3
+ServerActive=172.19.0.3
+# hostname will used to check whether the same host is available on UI or not
+Hostname=localhost.localdomain
+Include=/etc/zabbix/zabbix_agentd.d/*.conf
+```
+
+- By default the agent runs on port 10050 and the mentioned server will try to connect to the agent.
+- I did try to change the server to `192.168.1.6` that is my host IP but it didn't work and throws an error
+- Because, the server is trying to connect to the agent not the vice versa hence server connects from its own IP(container's IP) not from the proxy I passed.
+- server runs on port 10051.
+
+```
+4086:20230517:073337.130 failed to accept an incoming connection: connection from "172.19.0.3" rejected, allowed hosts: "192.168.1.6"
+```
+
+### API(Haven't implemented)
+
+- [QuickStart](https://www.zabbix.com/documentation/current/en/manual/api)
+- curl --request POST \
+   --url 'http://localhost/api_jsonrpc.php' \
+   --header 'Authorization: Bearer 26e578c6352db346a493721f3e2629c0fbb4311d34d5b6d2680ccee1fc463d8b'
+
+- curl --request POST \
+ --url 'https://localhost/api_jsonrpc.php' \
+ --header 'Content-Type: application/json-rpc' \
+ --data '{"jsonrpc":"2.0","method":"host.get","params":{"output":["hostid"]},"auth":"26e578c6352db346a493721f3e2629c0fbb4311d34d5b6d2680ccee1fc463d8b","id":1}'
