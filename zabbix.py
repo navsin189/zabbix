@@ -12,11 +12,12 @@ def get_hostname_detail(hostname):
       'proxy_address': '', 'auto_compress': '1', 'custom_interfaces': '0', 'uuid': '', 'vendor_name': '', 
       'vendor_version': '', 'inventory_mode': '1', 'active_available': '1'}]
     """
-    try:
-        host_details = zapi.host.get({'filter': {'host': hostname}})
+
+    host_details = zapi.host.get({'filter': {'host': hostname}})
+    if len(host_details) > 0:
         return host_details[0]['hostid']
-    except ZabbixAPIException as e:
-        print('Zabbix API Host error (%s)', e)
+    else:
+        return None
 
 
 if __name__ == '__main__':
