@@ -15,11 +15,15 @@ For more information and related downloads for Zabbix components, please visit h
   - In a passive check the agent responds to a data request. Zabbix server (or proxy) asks for data, for example, CPU load, and Zabbix agent sends back the result.
   - Active checks require more complex processing. The agent must first retrieve a list of items from Zabbix server for independent processing. Then it will periodically send new values to the server.
 
+### Architecture
+
+![Zabbix Architecture](https://static.packt-cdn.com/products/9781785289262/graphics/4239_01_02.jpg)
+
 ### SETUP
 
-- ![Zabbix Architecture](https://static.packt-cdn.com/products/9781785289262/graphics/4239_01_02.jpg)
 - Initially I'm going to setup docker containers to have less load and better understanding.
 - Zabbix-6.4.2 requires MySQL >= 8 as database. Other RDMS can be used in place of MySQL.
+- I'm not setting proxies.
 
 ```
 sudo docker run --network zabbix --name zabbix_mysql -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=naveen -e MYSQL_USER=zabbix_admin -e MYSQL_PASSWORD=password -d mysql:8.0
