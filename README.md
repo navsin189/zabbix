@@ -26,6 +26,13 @@ For more information and related downloads for Zabbix components, please visit h
 - I'm not setting proxies.
 
 ```
+sudo docker compose up -d
+# wait for some minutes as zabbix database takes time to create
+```
+
+**OR**
+
+```
 sudo docker run --network zabbix --name zabbix_mysql -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=naveen -e MYSQL_USER=zabbix_admin -e MYSQL_PASSWORD=password -d mysql:8.0
 
 # After the server launched wait for some minutes as the Zabbix database Schema is getting created.
