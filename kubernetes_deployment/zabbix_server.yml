@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: zabbix-server-deployment
+  labels:
+    app: zabbix-server
+spec: #this spec meant for deployment
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zabbix-server
+  template: #template equals to webapp_pod.yml that inlining ngnix_pod.yml
+    metadata:
+      name: zabbix_server
+      labels:
+        app: zabbix-server-pod
+        environment: "production"
+    spec:
+      containers:
+        - name: zabbix_server_mysql
+          image: zabbix/zabbix-server-mysql:ubuntu-latest
+          ports:
+            - containerPort: 10051
+          env:
+            - name: DB_SERVER_HOST
+              value: mysql-service
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_PASSWORD
+              value: encrypt
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-server-service
+spec:
+  type: NodePort
+  selector:
+    app: zabbix-server-pod #should be shame as pod's metadata's label
+  ports:
+    - protocol: TCP
+      port: 10051
+      targetPort: 10051 #should be same as containerport
+      #nodePort: 30124 #webapp homepage will available on workernodeIP:30124
+
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: zabbix-web-deployment
+  labels:
+    app: zabbix-web
+spec: #this spec meant for deployment
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zabbix-web
+  template: #template equals to webapp_pod.yml that inlining ngnix_pod.yml
+    metadata:
+      name: zabbix_web
+      labels:
+        app: zabbix-web-pod
+        environment: "production"
+    spec:
+      containers:
+        - name: zabbix_web_apache
+          image: zabbix/zabbix-web-apache-mysql:ubuntu-latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_SERVER_HOST
+              value: mysql-service
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_PASSWORD
+              value: encrypt
+            - name: ZBX_SERVER_HOST
+              value: zabbix-server-service
+            - name: PHP_TZ
+              value: Asia/Kolkata
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-web-service
+spec:
+  type: NodePort
+  selector:
+    app: zabbix-web-pod #should be shame as pod's metadata's label
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080 #should be same as containerport
+      nodePort: 80 #webapp homepage will available on workernodeIP:30124

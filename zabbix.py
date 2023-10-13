@@ -21,8 +21,8 @@ def get_hostname_detail(hostname):
         return None
 
 
-def get_hostgroup(templatename):
-    group = zapi.hostgroup.get({'filter': {'name': [templatename]}})
+def get_hostgroup(groupname):
+    group = zapi.hostgroup.get({'filter': {'name': [groupname]}})
     print(group)
 
 
@@ -34,7 +34,6 @@ def get_template(templatename):
 def create_host():
     host = zapi.host.create({"host": "google.com", "interfaces": [{"type": 1, "main": 1, "useip": 0, "dns": "google.com", "ip": "127.0.0.1", "port": "10050"}], "groups": [
                             {"groupid": "350"}], "templates": [{"templateid": "1897942"}], "proxy_hostid": "1897681"})
-    # for machine_count in range(1,21):
     print(host)
 
 
