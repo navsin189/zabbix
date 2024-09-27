@@ -9,7 +9,7 @@ services:
       - MYSQL_USER=naveen
       - MYSQL_PASSWORD=secret
   zabbix_server:
-    image: zabbix/zabbix-server-mysql:alpine-6.4.3
+    image: zabbix/zabbix-server-mysql:ubuntu-5.0.33
     privileged: true
     container_name: zabbix_server_mysql
     ports:
@@ -21,7 +21,7 @@ services:
       - MYSQL_PASSWORD=encrypted
       - DB_SERVER_HOST=zabbix_mysql
   web_interface:
-    image: zabbix/zabbix-web-apache-mysql:ubuntu-6.4.0
+    image: zabbix/zabbix-web-apache-mysql:ubuntu-5.0.33
     privileged: true
     container_name: zabbix_web_apache_mysql
     ports:
